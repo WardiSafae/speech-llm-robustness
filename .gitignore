@@ -1,0 +1,97 @@
+*.md
+# -------------------------
+# Python
+# -------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# -------------------------
+# Jupyter
+# -------------------------
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# -------------------------
+# Données volumineuses (non versionnées)
+# -------------------------
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+!data/processed/manifest.tsv
+
+# -------------------------
+# Modèles et checkpoints
+# -------------------------
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+checkpoints/
+models_cache/
+*.onnx
+
+# -------------------------
+# Résultats générés
+# -------------------------
+results/figures/*.png
+results/figures/*.pdf
+results/figures/*.svg
+results/tables/*.csv
+results/tables/*.xlsx
+!results/figures/.gitkeep
+!results/tables/.gitkeep
+
+# -------------------------
+# Secrets et environnements
+# -------------------------
+.env
+.env.*
+*.env
+secrets/
+token
+*.token
+
+# -------------------------
+# Système
+# -------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# -------------------------
+# IDE
+# -------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# -------------------------
+# Logs
+# -------------------------
+*.log
+logs/
+
+# -------------------------
+# Scripts temporaires (racine)
+# -------------------------
+test_whisper.py
+test_wav2vec2.py
+test_qwen.py
+download_samples.py

@@ -1,0 +1,22 @@
+model: openai/whisper-small
+language: fr
+dataset:
+  name: common_voice
+  split: train
+  max_samples: 5000
+training:
+  output_dir: checkpoints/whisper-finetuned
+  per_device_train_batch_size: 8
+  gradient_accumulation_steps: 2
+  learning_rate: 1.0e-5
+  num_train_epochs: 3
+  warmup_steps: 200
+  fp16: true
+  eval_strategy: steps
+  eval_steps: 200
+  save_steps: 500
+  logging_steps: 50
+augmentation:
+  white_noise_snr: [5, 10, 15]
+  speed_rates: [0.9, 1.0, 1.1]
+  use_specaugment: true

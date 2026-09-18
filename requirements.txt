@@ -1,0 +1,32 @@
+# Frameworks ML
+torch>=2.1
+transformers>=4.40
+torchaudio>=2.1
+
+# Audio
+librosa>=0.10
+soundfile>=0.12
+pydub>=0.25
+audiomentations>=0.34
+
+# Évaluation
+jiwer>=3.0
+evaluate>=0.4
+scikit-learn>=1.4
+
+# Données
+datasets>=2.19
+pandas>=2.2
+numpy>=1.26
+
+# Visualisation
+matplotlib>=3.8
+seaborn>=0.13
+plotly>=5.20
+
+# Configuration & CLI
+pyyaml>=6.0
+tqdm>=4.66
+
+# Tests
+pytest>=8.0
