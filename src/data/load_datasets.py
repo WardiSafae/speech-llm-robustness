@@ -40,7 +40,7 @@ logger = setup_logger(__name__)
 # Constantes
 # ---------------------------------------------------------------------------
 
-SUPPORTED_MODES = ["local", "synthetic", "streaming"]
+SUPPORTED_MODES = ["local", "synthetic", "streaming", "neural"]
 SUPPORTED_DATASETS = ["fleurs", "librispeech", "common_voice"]
 
 LANG_CONFIGS = {
@@ -302,6 +302,135 @@ def load_streaming(
 
 
 # ---------------------------------------------------------------------------
+# Mode 4 — NEURAL (Edge TTS)
+# ---------------------------------------------------------------------------
+
+# Voix Edge TTS recommandées par langue (qualité naturelle)
+EDGE_TTS_VOICES = {
+    "en": "en-US-JennyNeural",      # Femme US, naturelle, conversationnelle
+    "fr": "fr-FR-DeniseNeural",     # Femme FR, claire et professionnelle
+    "ar": "ar-EG-SalmaNeural",      # Femme Égypte, naturelle
+}
+
+# Alternatives (mâle)
+EDGE_TTS_VOICES_MALE = {
+    "en": "en-US-GuyNeural",
+    "fr": "fr-FR-HenriNeural",
+    "ar": "ar-SA-ZariyahNeural",
+}
+
+
+def _generate_speech_edge_tts(text: str, output_path: Path, lang: str,
+                               gender: str = "female", rate: str = "-5%") -> bool:
+    """
+    Génère un WAV via Edge TTS (voix neuronales Microsoft).
+    
+    Args:
+        text: texte à synthétiser
+        output_path: chemin de sortie (.mp3 ou .wav)
+        lang: code langue (en, fr, ar)
+        gender: 'female' ou 'male'
+        rate: vitesse ('-5%' = légèrement plus lent, plus naturel)
+    """
+    try:
+        import edge_tts
+    except ImportError:
+        logger.warning("edge-tts non installé. `pip install edge-tts`")
+        return False
+
+    import asyncio
+
+    # Sélectionner la voix
+    voice_map = EDGE_TTS_VOICES if gender == "female" else EDGE_TTS_VOICES_MALE
+    voice = voice_map.get(lang)
+    if not voice:
+        logger.warning(f"Pas de voix Edge TTS pour '{lang}'")
+        return False
+
+    # Edge TTS produit du MP3 → on convertit en WAV 16 kHz
+    mp3_path = output_path.with_suffix(".mp3")
+
+    async def _synth():
+        communicate = edge_tts.Communicate(text, voice, rate=rate)
+        await communicate.save(str(mp3_path))
+
+    try:
+        asyncio.run(_synth())
+    except Exception as e:
+        logger.warning(f"Edge TTS erreur : {e}")
+        return False
+
+    if not mp3_path.exists() or mp3_path.stat().st_size < 1000:
+        logger.warning(f"Edge TTS n'a pas généré de fichier valide : {mp3_path}")
+        return False
+
+    # Convertir MP3 → WAV 16 kHz mono
+    try:
+        audio, sr = sf.read(str(mp3_path), always_2d=False)
+        if audio.ndim > 1:
+            audio = audio.mean(axis=1)
+        _save_wav(output_path, audio, sr)
+        mp3_path.unlink()  # Nettoyer le MP3 intermédiaire
+        return True
+    except Exception as e:
+        logger.warning(f"Conversion MP3→WAV échouée : {e}")
+        return False
+
+
+def load_neural(output_dir: Path, n: int = 2,
+                languages: list[str] | None = None,
+                gender: str = "female") -> None:
+    """
+    Génère des WAV de test avec Edge TTS (voix neuronales Microsoft).
+    
+    Args:
+        output_dir: dossier de sortie
+        n: nombre d'échantillons par langue
+        languages: liste de codes langue (en, fr, ar)
+        gender: 'female' ou 'male'
+    """
+    output_dir.mkdir(parents=True, exist_ok=True)
+    languages = languages or list(SENTENCES.keys())
+
+    logger.info(f"[NEURAL] Edge TTS — {n} échantillons × {len(languages)} langues (voix {gender})")
+
+    rows = []
+    for lang in languages:
+        if lang not in SENTENCES:
+            logger.warning(f"Langue '{lang}' non supportée, ignorée.")
+            continue
+
+        for i in range(n):
+            out_path = output_dir / f"neural_{lang}_{i:02d}.wav"
+            text = SENTENCES[lang]
+
+            success = _generate_speech_edge_tts(text, out_path, lang, gender=gender)
+            if not success:
+                logger.warning(f"  ✗ {out_path.name} — fallback sinus")
+                freqs = {"en": 440.0, "fr": 523.25, "ar": 659.25}
+                audio = _generate_sine(freq_hz=freqs.get(lang, 440.0))
+                _save_wav(out_path, audio, 16000)
+
+            rows.append({
+                "audio_path": str(out_path).replace("\\", "/"),
+                "transcript": text,
+                "language": lang,
+            })
+            logger.info(f"  ✓ {out_path.name}")
+
+    # Écrire un manifest (append si existe)
+    manifest_path = output_dir / "manifest.tsv"
+    new_df = pd.DataFrame(rows)
+    if manifest_path.exists():
+        existing = pd.read_csv(manifest_path, sep="\t")
+        combined = pd.concat([existing, new_df], ignore_index=True)
+        combined.to_csv(manifest_path, sep="\t", index=False, encoding="utf-8")
+    else:
+        new_df.to_csv(manifest_path, sep="\t", index=False, encoding="utf-8")
+
+    logger.info(f"[NEURAL] Manifest mis à jour : {manifest_path} ({len(rows)} nouvelles entrées)")
+
+# ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
@@ -325,6 +454,8 @@ def main() -> None:
                         help="[synthetic] Langues séparées par virgule (en,fr,ar)")
     parser.add_argument("--language", default=None,
                         help="[streaming] Code langue ISO (en, fr, ar)")
+    parser.add_argument("--gender", default="female", choices=["female", "male"],
+                        help="[neural] Genre de la voix Edge TTS")
     args = parser.parse_args()
 
     output_dir = Path(args.output)
@@ -348,6 +479,9 @@ def main() -> None:
             n=args.n,
             language=args.language,
         )
+    elif args.mode == "neural":
+        langs = [x.strip() for x in args.languages.split(",") if x.strip()]
+        load_neural(output_dir, n=args.n, languages=langs, gender=args.gender)
 
 
 if __name__ == "__main__":
