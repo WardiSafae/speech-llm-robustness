@@ -1,0 +1,20 @@
+{
+  "language": "fr",
+  "model": "openai/whisper-tiny",
+  "lora_enabled": false,
+  "n_samples": 3,
+  "before": {
+    "wer": 0.4444,
+    "cer": 0.1273
+  },
+  "after": {
+    "wer": 0.0,
+    "cer": 0.0
+  },
+  "improvement": {
+    "wer_abs": 0.4444,
+    "wer_rel_pct": 100.0,
+    "cer_abs": 0.1273,
+    "cer_rel_pct": 100.0
+  }
+}

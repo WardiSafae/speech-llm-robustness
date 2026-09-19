@@ -1,22 +1,46 @@
-model: openai/whisper-small
-language: fr
-dataset:
-  name: common_voice
-  split: train
-  max_samples: 5000
+# Configuration de fine-tuning LoRA pour Whisper
+model:
+  name: openai/whisper-tiny
+  language: fr           # fr, ar, en
+  task: transcribe
+
+data:
+  manifest: data/raw/manifest.tsv
+  audio_dir: data/raw
+  max_audio_length_s: 30.0
+  eval_split: 0.2        # 20% pour validation
+
+lora:
+  enabled: false
+  r: 16                  # rang LoRA
+  lora_alpha: 32
+  lora_dropout: 0.05
+  target_modules:
+    - q_proj
+    - v_proj
+    - k_proj
+    - out_proj
+  bias: none
+
 training:
-  output_dir: checkpoints/whisper-finetuned
-  per_device_train_batch_size: 8
-  gradient_accumulation_steps: 2
-  learning_rate: 1.0e-5
+  output_dir: checkpoints/whisper-tiny-full
   num_train_epochs: 3
-  warmup_steps: 200
-  fp16: true
-  eval_strategy: steps
-  eval_steps: 200
-  save_steps: 500
-  logging_steps: 50
-augmentation:
-  white_noise_snr: [5, 10, 15]
-  speed_rates: [0.9, 1.0, 1.1]
-  use_specaugment: true
+  per_device_train_batch_size: 1    # ← batch 1
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 1    # ← pas d'accumulation
+  learning_rate: 1.0e-5             # ← learning rate plus bas
+  warmup_steps: 5
+  logging_steps: 5
+  save_steps: 10                    # ← sauver moins souvent
+  eval_steps: 10
+  save_total_limit: 1               # ← garder 1 seul checkpoint
+  fp16: false
+  gradient_checkpointing: true      # ← ESSENTIEL pour économiser RAM
+  max_steps: 10                     # ← 10 steps max
+  report_to: none
+  save_safetensors: false           # ← format PyTorch classique
+  dataloader_pin_memory: false      # ← éviter warning
+
+evaluation:
+  manifest: data/raw/manifest.tsv
+  output: results/finetuning
