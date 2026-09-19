@@ -48,11 +48,12 @@ models_cache/
 # -------------------------
 # Résultats générés
 # -------------------------
-results/figures/*.png
-results/figures/*.pdf
-results/figures/*.svg
-results/tables/*.csv
-results/tables/*.xlsx
+results/figures/*
+
+results/tables/*
+
+results/error_analysis/*
+
 !results/figures/.gitkeep
 !results/tables/.gitkeep
 

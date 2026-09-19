@@ -132,11 +132,18 @@ def evaluate_model(
 
     # --- CSV détaillé par modèle ---
     detail_csv = output_dir / f"{model_name}_results.csv"
+
+    languages = [
+        Path(p).stem.split("_")[1] if "_" in Path(p).stem else "?"
+        for p in paths_used
+    ]
+
     pd.DataFrame({
         "audio_path": paths_used,
         "reference": references,
         "hypothesis": hypotheses,
         "latency_s": latencies,
+        "language": languages,     # ← NOUVELLE COLONNE
     }).to_csv(detail_csv, index=False, encoding="utf-8")
     logger.info(f"Détail sauvegardé : {detail_csv}")
 
