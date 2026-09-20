@@ -101,3 +101,8 @@ test_whisper.py
 test_wav2vec2.py
 test_qwen.py
 download_samples.py
+
+# Autoriser les résultats FLEURS (importants pour la reproductibilité)
+!results/tables/fleurs/
+!results/tables/fleurs/*.csv
+!results/tables/fleurs/*.md
