@@ -94,17 +94,90 @@ def apply_perturbation(audio_path: Path, perturbation: str, output_dir: Path) ->
     sf.write(str(out_path), out, sr)
     return out_path
 
+def apply_perturbation_with_severity(
+    audio_path: Path,
+    perturbation: str,
+    severity: float,
+    output_dir: Path,
+) -> Path:
+    """
+    Applique une perturbation avec un niveau de sévérité contrôlé.
+
+    Args:
+        audio_path: fichier audio source
+        perturbation: white_noise, street_noise, reverb, clipping, speed
+        severity: 
+            - white_noise / street_noise : SNR en dB (5, 10, 15)
+            - reverb : room_scale (0.1, 0.3, 0.5)
+            - clipping : threshold_ratio (0.7, 0.5, 0.3)
+            - speed : rate (0.9, 1.0, 1.1)
+        output_dir: dossier de sortie
+    """
+    audio, sr = librosa.load(str(audio_path), sr=16000, mono=True)
+
+    if perturbation in ("white_noise", "street_noise"):
+        snr_db = severity
+        if perturbation == "white_noise":
+            out = _white_noise(audio, snr_db=snr_db)
+        else:
+            out = _street_noise(audio, snr_db=snr_db)
+        suffix = f"snr{int(snr_db)}"
+
+    elif perturbation == "reverb":
+        room_scale = severity
+        out = _reverb(audio, sr, room_scale=room_scale)
+        suffix = f"room{room_scale}"
+
+    elif perturbation == "clipping":
+        threshold_ratio = severity
+        out = _clipping(audio, threshold_ratio=threshold_ratio)
+        suffix = f"clip{threshold_ratio}"
+
+    elif perturbation == "speed":
+        rate = severity
+        out, sr = _speed(audio, sr, rate=rate)
+        suffix = f"spd{rate}"
+
+    else:
+        raise ValueError(f"Perturbation '{perturbation}' non supportée.")
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    out_path = output_dir / f"{audio_path.stem}__{perturbation}_{suffix}.wav"
+    sf.write(str(out_path), out, sr)
+    return out_path
+
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Génération de perturbations acoustiques.")
     parser.add_argument("--input", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--types", required=True)
+    parser.add_argument("--severity-levels", action="store_true",
+                        help="Appliquer 3 niveaux de sévérité par perturbation")
     args = parser.parse_args()
 
     input_dir, output_dir = Path(args.input), Path(args.output)
     perturbations = [p.strip() for p in args.types.split(",")]
 
+    # Grille de sévérité par perturbation
+    SEVERITY_GRID = {
+        "white_noise": [5.0, 10.0, 15.0],       # SNR dB
+        "street_noise": [5.0, 10.0, 15.0],
+        "reverb": [0.1, 0.3, 0.5],              # room scale
+        "clipping": [0.7, 0.5, 0.3],            # threshold ratio
+        "speed": [0.9, 1.0, 1.1],               # rate
+    }
+
+    if args.severity_levels:
+        for audio_file in input_dir.glob("**/*.wav"):
+            for p in perturbations:
+                for sev in SEVERITY_GRID.get(p, []):
+                    try:
+                        out = apply_perturbation_with_severity(audio_file, p, sev, output_dir)
+                        logger.info(f"✓ {out.name}")
+                    except Exception as e:
+                        logger.error(f"✗ {audio_file.name} [{p}={sev}] : {e}")
+                        
     n = 0
     for audio_file in input_dir.glob("**/*.wav"):
         for p in perturbations:
