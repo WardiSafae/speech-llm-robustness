@@ -134,3 +134,83 @@ clipping (tous) : ~0.000 🟢
 - Notebook Colab : (à publier)
 
 
+
+## Analyse par langue (détail)
+
+### Baseline (speed=1.0, conditions propres)
+
+| Langue | WER | Écart vs EN |
+|--------|-----|-------------|
+| EN | 0.0452 | référence |
+| FR | 0.0904 | +0.045 |
+| AR | **0.2262** | **+0.181** |
+
+**L'arabe est 5× plus difficile que l'anglais** en baseline.
+
+### 🎯 Découverte : le français dégrade PLUS que l'arabe (en relatif)
+
+**Contre-intuitif !** Analysons la dégradation **relative** (ratio WER perturbé / WER baseline) :
+
+| Perturbation | FR (ratio) | AR (ratio) | Lequel souffre plus ? |
+|--------------|-----------|-----------|----------------------|
+| white_noise snr5 | **×4.9** | ×1.9 | 🔴 FR |
+| speed 1.1 | **×3.6** | ×2.1 | 🔴 FR |
+| reverb room0.5 | **×6.3** | ×2.6 | 🔴 FR |
+
+**Interprétation** : le baseline FR est bas (0.090), donc chaque dégradation
+absolue (+0.35) est énorme en relatif. L'arabe, déjà à 0.226, dégrade moins
+**proportionnellement**.
+
+**Implication pour le fine-tuning** : le français a **plus de marge
+de progression absolue** que l'arabe. Cibler FR en priorité.
+
+### 🎯 Découverte : l'arabe est le plus robuste au clipping
+
+| Clipping | EN (ΔWER) | FR (ΔWER) | **AR (ΔWER)** |
+|----------|-----------|-----------|---------------|
+| clip0.3 | +0.007 | +0.022 | **-0.003** (nul) |
+| clip0.5 | 0.000 | +0.001 | 0.000 |
+| clip0.7 | 0.000 | +0.002 | 0.000 |
+
+**AR a un ΔWER négatif** à clip0.3 → bruit statistique → **robustesse totale**.
+
+**Hypothèse** : la structure phonétique arabe (voyelles longues, consonnes
+emphatiques) survit au clipping Mel.
+
+### 🎯 Découverte : reverb, la pire pour FR et AR
+
+À `room0.5` :
+
+| Langue | ΔWER | Ratio de dégradation |
+|--------|------|---------------------|
+| **EN** | **+0.096** | ×3.1 |
+| **FR** | **+0.475** | ×6.3 |
+| **AR** | **+0.371** | ×2.6 |
+
+**L'anglais résiste 4× mieux** que le français et l'arabe à la reverb.
+
+**Hypothèse** : Whisper a été entraîné sur massive quantité d'anglais en
+environnement varié (podcasts, YouTube, réunions). FR et AR sont
+sous-représentés → moins de robustesse apprise.
+
+### Hiérarchie des perturbations par langue
+
+| Langue | Pire perturbation | Meilleure |
+|--------|-------------------|-----------|
+| **EN** | speed 1.1 (+0.071) | clipping (0) |
+| **FR** | **reverb 0.5 (+0.475)** | clipping (+0.002) |
+| **AR** | **speed 1.1 (+0.252)** | clipping (~0) |
+
+**Note** : FR et AR ont des sensibilités différentes — FR souffre plus de la
+reverb, AR plus du speed.
+
+## 🎯 Recommandations de fine-tuning
+
+**Priorités (par impact et marge de progression) :**
+
+1. **Français + reverb room0.5** → gain potentiel de -0.40 WER
+2. **Français + white_noise snr5** → gain potentiel de -0.30 WER
+3. **Arabe + speed 1.1** → gain potentiel de -0.25 WER
+4. **Arabe + reverb room0.5** → gain potentiel de -0.30 WER
+
+**Ignorer le clipping** — aucune amélioration possible.
