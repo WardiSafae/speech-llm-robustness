@@ -2,6 +2,7 @@
 # Documentation
 !docs/*.md
 !docs/**/*.md
+!README.md
 
 # -------------------------
 # Python
