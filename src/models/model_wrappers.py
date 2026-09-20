@@ -183,14 +183,33 @@ class Qwen2AudioWrapper(SpeechLLMWrapper):
         return self.processor.batch_decode(ids, skip_special_tokens=True)[0]
 
 
+
+# ---------------------------------------------------------------------------
+# Whisper-base
+# ---------------------------------------------------------------------------
+class WhisperBaseWrapper(WhisperWrapper):
+    """Whisper-base : 74 M params, plus rapide, qualité intermédiaire."""
+    MODEL_ID = "openai/whisper-base"
+
+# ---------------------------------------------------------------------------
+# Whisper-medium
+# ---------------------------------------------------------------------------
+
+class WhisperMediumWrapper(WhisperWrapper):
+    """Whisper-medium : 769 M params, meilleur sur les langues sous-dotées."""
+    MODEL_ID = "openai/whisper-medium"
+
 # ---------------------------------------------------------------------------
 # Registry
 # ---------------------------------------------------------------------------
 
 MODEL_REGISTRY = {
-    "whisper": WhisperWrapper,
+    "whisper": WhisperWrapper,               # small (244 M)
+    "whisper_base": WhisperBaseWrapper,      # base (74 M)
+    "whisper_medium": WhisperMediumWrapper,  # medium (769 M) 
     "wav2vec2": Wav2Vec2Wrapper,
     "qwen2_audio": Qwen2AudioWrapper,
+
 }
 
 

@@ -17,7 +17,7 @@ from pathlib import Path
 import jiwer
 import pandas as pd
 
-from src.models.model_wrappers import load_model
+from src.models.model_wrappers import load_model, MODEL_REGISTRY
 from src.utils.io import setup_logger
 
 logger = setup_logger(__name__)
@@ -174,7 +174,7 @@ def evaluate_model(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Évaluation des Speech-LLMs.")
-    parser.add_argument("--model", required=True, choices=["whisper", "wav2vec2", "qwen2_audio"])
+    parser.add_argument("--model", required=True, choices=list(MODEL_REGISTRY.keys()))
     parser.add_argument("--data", required=True, help="Dossier contenant les WAV à évaluer")
     parser.add_argument("--manifest", required=True, help="Chemin du manifest TSV")
     parser.add_argument("--output", required=True, help="Dossier de sortie des résultats")
