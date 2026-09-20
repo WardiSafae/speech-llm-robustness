@@ -1,0 +1,5 @@
+perturbation	wer_mean	wer_std	wer_max	n
+reverb	0.1927	0.2182	1.5	900
+white_noise	0.1699	0.1719	1.2	900
+speed	0.1644	0.1744	1.0	900
+clipping	0.0887	0.1074	0.6923	900

@@ -89,3 +89,31 @@ gain de 60 % de WER. Le compromis dépend du cas d'usage.
 3. Ajouter **Wav2Vec2-XLSR-53** et **Qwen2-Audio** (si ressources)
 4. Évaluer sur **enregistrements humains** (FLEURS, Common Voice)
 
+
+
+
+# Comparaison finale — 4 modèles Whisper
+
+## Résumé
+
+| Modèle | Params | WER baseline (ALL) | WER perturbé max | Hallucinations FR |
+|--------|--------|-------------------|------------------|-------------------|
+| whisper-base | 74 M | 0.304 (norm) | 8.68 | ? |
+| whisper-small | 244 M | ~0.30 | — | ? |
+| whisper-medium | 769 M | **0.107** | 8.68 | **5** (0.14 %) |
+| **whisper-large-v3** | **1.55 B** | **0.080** ✅ | ? | **44** (3.67 %) ⚠️ |
+
+## 🚨 Découverte majeure : le paradoxe WER vs hallucinations
+
+Large-v3 est **30 % meilleur** en WER mais **8× pire** en hallucinations sur FR.
+
+**Interprétation** :
+- **WER** capture la performance moyenne
+- **Hallucinations** capturent les cas extrêmes
+- Large-v3 a une **queue lourde** de distribution
+
+## Recommandation production
+
+- **whisper-medium** : préférable pour la production (moins d'hallucinations)
+- **whisper-large-v3 + détecteur** : alternative si latence OK
+- **Fine-tuning FR** : priorité absolue pour large-v3

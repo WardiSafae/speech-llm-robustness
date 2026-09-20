@@ -201,6 +201,16 @@ def detect_hallucination(
         reasons.append(f"hypothèse très longue ({hyp_len} tokens)")
         confidence_scores.append(0.8)
 
+    # Signal 9 : Troncature
+    if hyp_len < 5 and ref_len > 10:
+        reasons.append(f"troncature massive (hyp={hyp_len}, ref={ref_len})")
+        confidence_scores.append(0.9)
+
+    # Signal 10 : Troncature modérée
+    if len_ratio < 0.3 and ref_len > 15:
+        reasons.append(f"hypothèse trop courte (ratio {len_ratio:.2f})")
+        confidence_scores.append(0.7)
+
     is_hallucination = len(reasons) > 0
     confidence = float(np.mean(confidence_scores)) if confidence_scores else 0.0
 

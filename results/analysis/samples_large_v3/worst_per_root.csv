@@ -1,0 +1,11 @@
+root	language	perturbation	severity	wer_sample	reference	hypothesis
+fr_044	fr	reverb	0.5	1.5	une bombe a explosé devant le bureau du gouverneur général	 Et voilà, et ce, c'est le nouveau délégat du coup de la nage n'est pas.
+en_018	en	white_noise	5.0	1.2	but there are a lot of things about birds that still look like a dinosaur	 I don't know, I'm not a huge fan of the firework like I do in this place.
+fr_088	fr	white_noise	10.0	1.1176470588235294	une recherche sur internet de « cours en environnement hostile » fournira probablement l'adresse d'une entreprise locale	 On va chercher sur internet des cours en environnement aussi, il faut qu'on y a probablement un adresse pour montrer tout ce que c'est.
+fr_003	fr	white_noise	5.0	1.0384615384615385	le rugissement du tigre ne ressemble pas au rugissement ample du lion mais plutôt à une phrase dont les mots seraient des cris et des grondements	 vous ne pouvez pas vous débrouiller, vous êtes en train de vous débrouiller, vous êtes en train de vous débrouiller, vous êtes en train de vous débrouiller,
+ar_028	ar	reverb	0.5	1.0	فكر في مسار التزلج على الجليد باعتباره مسارًا مماثل للمشي لمسافات طويلة	 كيف نصار التزامد على الجميع بأتباعه مصار من ميت المشي ومسافات طويلة؟
+fr_064	fr	reverb	0.5	1.0	en 1990 il a été ajouté à la liste des sites du patrimoine mondial en danger en raison de la menace des sables du désert	 Merci.
+fr_045	fr	speed	1.1	1.0	rolando mendoza tira avec son fusil m16 sur les touristes	 On a un don et nos acquéreurs sont futiles. NCS sur les touristes.
+ar_030	ar	reverb	0.5	1.0	الأسود هي أكثر القطط اجتماعية وتعيش في مجموعات كبيرة تدعى قطعاناً	 أجلسو في حقثاً قطة الشمعية وتعيشي من المعاد كبير تبع قطعان
+fr_048	fr	reverb	0.5	1.0	l'équipe des sapeurs pompiers a finalement éteint le feu à 23 h 35	 L'équipe de 7 ans pour le direct, il y a donc été laissée à 23h35.
+fr_097	fr	reverb	0.5	1.0	les blogs sont un outil qui stimule la collaboration et encourage les élèves à prolonger leur apprentissage bien au-delà de la journée scolaire traditionnelle	 Merci.
