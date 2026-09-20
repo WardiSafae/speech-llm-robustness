@@ -1,0 +1,6 @@
+audio_path	language	perturbation	ref_len	hyp_len	len_ratio	wer
+data/processed/fleurs_perturbed/ar_000__reverb_room0.5.wav	ar	reverb	15	57	3.8	3.8
+data/processed/fleurs_perturbed/fr_031__white_noise_snr15.wav	fr	white_noise	22	153	6.954545454545454	6.636363636363637
+data/processed/fleurs_perturbed/fr_045__reverb_room0.5.wav	fr	reverb	10	21	2.1	2.0
+data/processed/fleurs_perturbed/fr_058__white_noise_snr5.wav	fr	white_noise	21	77	3.6666666666666665	3.5238095238095237
+data/processed/fleurs_perturbed/fr_064__reverb_room0.5.wav	fr	reverb	25	221	8.84	8.68
