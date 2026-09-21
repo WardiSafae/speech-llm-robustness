@@ -106,3 +106,22 @@ download_samples.py
 !results/tables/fleurs/
 !results/tables/fleurs/*.csv
 !results/tables/fleurs/*.md
+
+# LaTeX
+*.aux
+*.out
+*.synctex.gz
+*.log
+*.toc
+*.bbl
+*.blg
+
+# Archives générées
+*.zip
+finetuning_data.zip
+
+# Données de fine-tuning générées
+data/finetuning/
+
+# PDF (optionnel — décommenter si vous ne voulez pas versionner le PDF)
+# paper.pdf
