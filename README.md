@@ -340,6 +340,19 @@ Reverb > White noise > Speed >> Clipping
 
 **Note** : le **clipping est inoffensif** (ΔWER ≈ 0).
 
+
+### Fine-tuning ciblé (whisper-medium)
+
+| Métrique | Original | Fine-tuné |
+|----------|----------|-----------|
+| WER baseline | 0.114 | **0.095** ✅ |
+| WER perturbé | 0.322 | **0.095** ✅ |
+| Hallucinations | 5 | **3** ✅ |
+
+**Le fine-tuning ciblé réduit le WER de 70 % sur les cas difficiles.**
+
+Modèle : [safaewardi/whisper-medium-finetuned](https://huggingface.co/safaewardi/whisper-medium-finetuned)
+
 ---
 
 ## 📚 Documentation
